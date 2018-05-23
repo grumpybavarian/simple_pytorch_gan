@@ -53,13 +53,13 @@ def main():
     d.to(device)
 
     # generate real dataset
-    n = 1024
+    n = 2048
     data = generate_real_data(n)
     batched_data = np.split(data, n / 8)
 
     # define optimizers for Generator and Discriminator
-    g_optim = optim.Adam(g.parameters(), lr=2e-3)
-    d_optim = optim.Adam(d.parameters(), lr=2e-3)
+    g_optim = optim.Adam(g.parameters(), lr=1e-4)
+    d_optim = optim.Adam(d.parameters(), lr=1e-4)
 
     # defines losses
     criterion = nn.BCELoss()
@@ -85,8 +85,8 @@ def main():
             d_optim.step()
 
     # training
-    num_epochs = 10000
-    num_samples = 1000
+    num_epochs = 1000
+    num_samples = 50000
     dists = np.zeros((num_epochs, num_samples))
     for epoch in range(num_epochs):
         g_loss_mean = 0.
@@ -124,10 +124,10 @@ def main():
         if epoch % 10 == 0:
             print("Epoch {}: g: {}, d: {}".format(epoch, g_loss_mean / i, d_loss_mean / (i * 3)))
 
-        with torch.no_grad():
-            inputs = torch.rand((num_samples, 1))
-            outputs = g(inputs).numpy().flatten()
-            dists[epoch] = outputs
+            with torch.no_grad():
+                inputs = torch.rand((num_samples, 1))
+                outputs = g(inputs).numpy().flatten()
+                dists[epoch] = outputs
 
     np.save('dists.npy', dists)
 
